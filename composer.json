@@ -1,0 +1,19 @@
+{
+    "name": "itcoder/jsonrpc-client",
+    "description": "php json-rpc client for connection golang based on jsonrpc protocol v1",
+    "type": "library",
+    "version": "0.6",
+    "authors": [
+        {
+            "name": "itcoder",
+            "email": "prototypenk@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=7.2.9"
+    },
+    "autoload": {
+        "psr-4": {"jsonRpcClient\\": "src/"}
+    }
+
+}
