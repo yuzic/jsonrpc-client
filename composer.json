@@ -2,7 +2,7 @@
     "name": "itcoder/jsonrpc-client",
     "description": "php json-rpc client for connection golang based on jsonrpc protocol v1",
     "type": "library",
-    "version": "0.6",
+    "version": "0.1",
     "authors": [
         {
             "name": "itcoder",
@@ -13,7 +13,7 @@
         "php": ">=7.2.9"
     },
     "autoload": {
-        "psr-4": {"jsonRpcClient\\": "src/"}
+        "psr-4": {"JsonRpcClient\\": "src/"}
     }
 
 }

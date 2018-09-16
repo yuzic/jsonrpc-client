@@ -1,6 +1,7 @@
 <?php
 
 use PHPUnit\Framework\TestCase;
+use JsonRpcClient\Client;
 
 class ClientTest extends TestCase
 {
@@ -8,6 +9,6 @@ class ClientTest extends TestCase
     {
         $client  = new Client;
 
-        $this->assertTrue($client->connect());
+        $this->assertTrue($client->query());
     }
 }
