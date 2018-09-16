@@ -5,6 +5,7 @@ use JsonRpcClient\Connection\TcpConnection;
 
 class TcpConnectionTest extends TestCase
 {
+
     public function testConnect()
     {
         $tcpConnection = new TcpConnection('127.0.0.1:1234');
