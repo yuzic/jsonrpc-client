@@ -9,7 +9,8 @@ class TcpConnectionTest extends TestCase
     public function testConnect()
     {
         $tcpConnection = new TcpConnection('127.0.0.1:1234');
-        $this->assertTrue($tcpConnection->send($this->getRequest(), 1));
+        $responce = $tcpConnection->send($this->getRequest(), 100);
+        $this->assertTrue($responce['error'] === false);
     }
 
 
