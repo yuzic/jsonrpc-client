@@ -2,107 +2,98 @@
 namespace JsonRpcClient\Connection;
 
 use JsonRpcClient\Request;
+use JsonRpcClient\Connection\Bridge\Socket;
+
 
 class TcpConnection implements Connection
 {
-    const READ_BUF = 4096;
-    private $ip;
-    private $port;
 
     private $sockfp;
 
-    public function __construct($address)
+    /** @var  array */
+    private $response = [
+        'error' => null,
+        'errorMsg' => null,
+        'data' => null,
+    ];
+
+    public function __construct(Socket $socketStream)
     {
-        list($this->ip, $this->port) = explode(':', $address);
+        $this->sockfp = $socketStream;
     }
 
 
-    public function send(Request $request, $timeout) : array
+    public function send(Request $request) : array
     {
-        $this->open();
-        $res = [
-            'error' => false,
-            'errorMsg' => null,
-            'data' => null,
-        ];
-        $content = $request->toJson() . "\n";
-        $written = $this->fwriteAll($content);
-        if ($written != strlen($content)) {
-            $res['error'] = true;
-            $res['errorMsg'] = 'write request error';
-            return $res;
-        }
-        stream_set_blocking($this->sockfp, true);
-        stream_set_timeout($this->sockfp, 0, $timeout * 1000);
-        $dataStr = $this->fgetsAll();
+        $socket =  $this->getSocket();
+        $socket->open();
 
-        $info = stream_get_meta_data($this->sockfp);
+        if (!$this->checkContent($request)) {
+            return $this->getResponse();
+        }
+
+
+        $socket->setBlocking();
+        $dataStr = $socket->fgetsAll();
+
+        $info = $socket->getMetaData();
 
         if ($info['timed_out'] && empty($dataStr)) {
-            $res['error'] = true;
-            $res['errorMsg'] = 'time out error';
-            return $res;
+            $response['error'] = true;
+            $response['errorMsg'] = 'time out error';
+            return $response;
         }
 
         $data = json_decode($dataStr, true);
 
         if (!isset($data)) {
-            $res['error'] = true;
-            $res['errorMsg'] = 'respond data error: not json';
-            return $res;
+            $response['error'] = true;
+            $response['errorMsg'] = 'respond data error: not json';
+            return $response;
         }
-        $res['data'] = $data;
-        return $res;
+        $response['data'] = $data;
+        return $response;
 
-    }
-
-
-    private function fwriteAll($content) : int
-    {
-        for ($written = 0; $written < strlen($content); $written += $fwrite) {
-            $fwrite = fwrite($this->sockfp, substr($content, $written));
-            if ($fwrite === false) {
-                return $written;
-            }
-        }
-        return $written;
-    }
-
-    private function fgetsAll() : string
-    {
-        $data = '';
-        while (($buffer = fgets($this->sockfp, self::READ_BUF)) !== false) {
-            $data .= $buffer;
-            if (substr($buffer, -1) == "\n") {
-                break;
-            }
-        }
-        return $data;
     }
 
     /**
-     * open a tcp connection
-     * @throws ConnectionException
+     * @param Request $request
+     * @return mixed array|bool
      */
-    private function open() : void
+    protected function checkContent(Request $request)
     {
-        $sockfp = fsockopen('tcp://' . $this->ip, $this->port, $errno, $errstr);
-        if (!$sockfp) {
-            throw new ConnectionException(sprintf('open connection failed: %s %s', $errstr, $errno));
-        } else {
-            $this->sockfp = $sockfp;
+        $content = $request->toJson();
+        $written =  $this->getSocket()->fwriteAll($content);
+        if ($written != strlen($content)) {
+            $this->setResponse('error', true);
+            $this->setResponse('errorMsg', 'write request error');
+
+            return false;
         }
+
+        return true;
     }
 
-    /**
-     * close current tcp connection
-     */
-    private function close()
+    protected function setResponse(string $name, $value)
     {
-        if (!isset($this->sockfp)) {
-            return;
-        }
-        fclose($this->sockfp);
-        $this->sockfp = null;
+        $this->response[$name] = $value;
     }
+
+
+    protected function getResponse() : array
+    {
+        return $this->response;
+    }
+
+
+    /**
+     * @return Socket
+     */
+    protected function getSocket()
+    {
+        return $this->sockfp;
+    }
+
+
+
 }
