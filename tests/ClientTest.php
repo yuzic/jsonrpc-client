@@ -2,8 +2,6 @@
 
 use PHPUnit\Framework\TestCase;
 use JsonRpcClient\Client;
-use JsonRpcClient\Connection\TcpConnection;
-use JsonRpcClient\Connection\Bridge\SocketStream;
 
 class ClientTest extends TestCase
 {
