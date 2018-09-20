@@ -7,17 +7,17 @@ use JsonRpcClient\Connection\Bridge\SocketStream;
 
 class ClientTest extends TestCase
 {
+    use \JsonRpcClient\Tests\TcpConnectionTrait;
+
     public function testConnect()
     {
-        $socketStream = new SocketStream('127.0.0.1:1234', 100);
-        $tcpConnection = new TcpConnection($socketStream);
-        $client  = new Client($tcpConnection);
+        $client  = new Client($this->getTcpConnection());
 
         $method = 'PackageJsonRpc.Push';
         $params = ['subscribe' => 1, 'validate' => true];
-
         $result = $client->query($method, $params);
-
         $this->assertTrue($result['data']['result'] === 'ok');
     }
+
+
 }

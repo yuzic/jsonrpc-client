@@ -13,7 +13,14 @@
         "php": ">=7.2.9"
     },
     "autoload": {
-        "psr-4": {"JsonRpcClient\\": "src/"}
+        "psr-4": {
+            "JsonRpcClient\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "JsonRpcClient\\Tests\\": "tests/"
+        }
     }
 
 }
