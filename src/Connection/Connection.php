@@ -10,5 +10,5 @@ interface Connection
      * @param $timeout
      * @return array
      */
-    public function send(Request $request) : array;
+    public function send(Request $request): array;
 }

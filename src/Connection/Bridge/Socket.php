@@ -7,15 +7,15 @@ interface Socket
     /**
      * @return array
      */
-    public function getMetaData() : array;
+    public function getMetaData(): array;
 
-    public function setBlocking() : void;
+    public function setBlocking(): void;
 
-    public  function fwriteAll(string $content) : int;
+    public  function fwriteAll(string $content): int;
 
-    public function fgetsAll() : string;
+    public function fgetsAll(): string;
 
-    public function open() : void;
+    public function open(): void;
 
-    public function close() : void;
+    public function close(): void;
 }

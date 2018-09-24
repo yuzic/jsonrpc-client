@@ -32,7 +32,7 @@ class TcpConnection implements Connection
      * @param Request $request
      * @return array
      */
-    public function send(Request $request) : array
+    public function send(Request $request): array
     {
         $socket =  $this->getSocket();
         $socket->open();
@@ -59,7 +59,7 @@ class TcpConnection implements Connection
      * @param Request $request
      * @return bool
      */
-    protected function checkContent(Request $request) : bool
+    protected function checkContent(Request $request): bool
     {
         $content = $request->toJson();
         $written =  $this->getSocket()->fwriteAll($content);
@@ -78,7 +78,7 @@ class TcpConnection implements Connection
      * @param Socket $socket
      * @return bool
      */
-    protected function checkTimeOut(Socket $socket)  : bool
+    protected function checkTimeOut(Socket $socket): bool
     {
         if ($socket->getMetaData()['timed_out'] && empty($socket->fgetsAll())) {
             $this->setResponse('error', true);
@@ -93,7 +93,7 @@ class TcpConnection implements Connection
      * @param Socket $socket
      * @return bool
      */
-    protected function checkResponse(Socket $socket) : bool
+    protected function checkResponse(Socket $socket): bool
     {
         $data = json_decode($socket->fgetsAll(), true);
 
@@ -112,7 +112,7 @@ class TcpConnection implements Connection
      * @param string $name
      * @param $value
      */
-    protected function setResponse(string $name, $value) : void
+    protected function setResponse(string $name, $value): void
     {
         $this->response[$name] = $value;
     }
@@ -121,7 +121,7 @@ class TcpConnection implements Connection
     /**
      * @return array
      */
-    protected function getResponse() : array
+    protected function getResponse(): array
     {
         return $this->response;
     }
@@ -130,7 +130,7 @@ class TcpConnection implements Connection
     /**
      * @return Socket
      */
-    protected function getSocket()
+    protected function getSocket(): Socket
     {
         return $this->sockfp;
     }

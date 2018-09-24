@@ -18,8 +18,10 @@ class Request
     }
 
 
-
-    public function toJson()
+    /**
+     * @return string
+     */
+    public function toJson(): string
     {
         return json_encode([
             'method' => $this->method,

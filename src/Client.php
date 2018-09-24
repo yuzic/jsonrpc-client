@@ -18,7 +18,7 @@ class Client
         $this->connection  = $connection;
     }
 
-    public function query(string $method, array $params) : array
+    public function query(string $method, array $params): array
     {
        $request =  new Request($method, $params, self::$SEQ_NEXT++);
        return $this->getConnection()->send($request);

@@ -34,7 +34,7 @@ trait TcpConnectionTrait
     /**
      * @return Request
      */
-    protected function getRequest() : Request
+    protected function getRequest(): Request
     {
         return  new Request('PackageJsonRpc.Push', ['subscribe' => 1, 'validate' => true], $this->seqId);
     }

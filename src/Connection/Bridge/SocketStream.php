@@ -27,19 +27,19 @@ class SocketStream implements Socket
     /**
      * @return array
      */
-    public function getMetaData() : array
+    public function getMetaData(): array
     {
         return stream_get_meta_data($this->sockfp);
     }
 
 
-    public function setBlocking() : void
+    public function setBlocking(): void
     {
         stream_set_blocking($this->sockfp, true);
         stream_set_timeout($this->sockfp, 0, $this->timeout * 1000);
     }
 
-    public  function fwriteAll($content) : int
+    public  function fwriteAll($content): int
     {
         for ($written = 0; $written < strlen($content); $written += $fwrite) {
             $fwrite = fwrite($this->sockfp, substr($content, $written));
@@ -50,7 +50,7 @@ class SocketStream implements Socket
         return $written;
     }
 
-    public function fgetsAll() : string
+    public function fgetsAll(): string
     {
         $data = '';
         while (($buffer = fgets($this->sockfp, self::READ_BUF)) !== false) {
@@ -66,7 +66,7 @@ class SocketStream implements Socket
      * open a tcp connection
      * @throws ConnectionException
      */
-    public function open() : void
+    public function open(): void
     {
         $sockfp = fsockopen('tcp://' . $this->ip, $this->port, $errno, $errstr);
         if (!$sockfp) {
@@ -79,7 +79,7 @@ class SocketStream implements Socket
     /**
      * close current tcp connection
      */
-    public function close() : void
+    public function close(): void
     {
         if (!isset($this->sockfp)) {
             return;
