@@ -8,6 +8,7 @@ use JsonRpcClient\Connection\Bridge\Socket;
 class TcpConnection implements Connection
 {
 
+    /** @var Socket  */
     private $sockfp;
 
     /** @var  array */
@@ -17,12 +18,20 @@ class TcpConnection implements Connection
         'data' => null,
     ];
 
+    /**
+     * TcpConnection constructor.
+     * @param Socket $socketStream
+     */
     public function __construct(Socket $socketStream)
     {
         $this->sockfp = $socketStream;
     }
 
 
+    /**
+     * @param Request $request
+     * @return array
+     */
     public function send(Request $request) : array
     {
         $socket =  $this->getSocket();
@@ -32,35 +41,25 @@ class TcpConnection implements Connection
             return $this->getResponse();
         }
 
-
         $socket->setBlocking();
-        $dataStr = $socket->fgetsAll();
-
-        $info = $socket->getMetaData();
-
-        if ($info['timed_out'] && empty($dataStr)) {
-            $response['error'] = true;
-            $response['errorMsg'] = 'time out error';
-            return $response;
+        if (!$this->checkTimeOut($socket)) {
+            return $this->getResponse();
         }
 
-        $data = json_decode($dataStr, true);
-
-        if (!isset($data)) {
-            $response['error'] = true;
-            $response['errorMsg'] = 'respond data error: not json';
-            return $response;
+        if (!$this->checkResponse($socket)) {
+            return $this->getResponse();
         }
-        $response['data'] = $data;
-        return $response;
+
+        return $this->getResponse();
 
     }
 
+
     /**
      * @param Request $request
-     * @return mixed array|bool
+     * @return bool
      */
-    protected function checkContent(Request $request)
+    protected function checkContent(Request $request) : bool
     {
         $content = $request->toJson();
         $written =  $this->getSocket()->fwriteAll($content);
@@ -74,12 +73,54 @@ class TcpConnection implements Connection
         return true;
     }
 
-    protected function setResponse(string $name, $value)
+
+    /**
+     * @param Socket $socket
+     * @return bool
+     */
+    protected function checkTimeOut(Socket $socket)  : bool
+    {
+        if ($socket->getMetaData()['timed_out'] && empty($socket->fgetsAll())) {
+            $this->setResponse('error', true);
+            $this->setResponse('errorMsg', 'time out error');
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * @param Socket $socket
+     * @return bool
+     */
+    protected function checkResponse(Socket $socket) : bool
+    {
+        $data = json_decode($socket->fgetsAll(), true);
+
+        if (!isset($data)) {
+            $this->setResponse('error', true);
+            $this->setResponse('errorMsg', 'respond data error: not json');
+            return false;
+        }
+
+        $this->setResponse('data', $data);
+        return true;
+
+    }
+
+    /**
+     * @param string $name
+     * @param $value
+     */
+    protected function setResponse(string $name, $value) : void
     {
         $this->response[$name] = $value;
     }
 
 
+    /**
+     * @return array
+     */
     protected function getResponse() : array
     {
         return $this->response;
